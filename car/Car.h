@@ -17,7 +17,7 @@ private:
 public:
     Car(OBU obu);
 
-    void registerInCSPA();
+    bool registerInCSPA();
 
     void authenticate(ChargingStation cs);
 };

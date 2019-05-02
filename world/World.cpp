@@ -4,8 +4,14 @@
 
 #include "World.h"
 
-void World::addNewCar() {
+void World::addCar() {
     this->cars.push_back(this->dmv.createCar());
+}
+
+void World::addNewCarS(const int count) {
+    for(int i=0; i< count; i++) {
+        addCar();
+    }
 }
 
 void World::addChargingStations(const int count) {

@@ -37,7 +37,20 @@ vector<byte> CSPA::authenticateCar(const char *preHead, const char *hashOBU, con
     byte calculatedHead[SHA256::DIGESTSIZE];
     SHA256().CalculateDigest(calculatedHead, (byte *) preHead, strlen(preHead));
 
+    string readableCalculatedHead, readableRegisteredHead;
+    CryptoPP::HexEncoder encoder;
+    encoder.Attach( new CryptoPP::StringSink( readableCalculatedHead ) );
+    encoder.Put( calculatedHead, sizeof(calculatedHead));
+    encoder.MessageEnd();
+    encoder.Attach( new CryptoPP::StringSink( readableRegisteredHead ) );
+    encoder.Put( (byte *)this->pseudonymsMap[hashOBU].c_str(), this->pseudonymsMap[hashOBU].length());
+    encoder.MessageEnd();
+
+    cout << "CSPA calculated pseudonym hash head: " << readableCalculatedHead << endl;
+    cout << "Registered pseudonym for the car: " << readableRegisteredHead << endl;
+
     if (memcmp(calculatedHead, this->pseudonymsMap[hashOBU].c_str(), SHA256::DIGESTSIZE) == 0) {
+        cout << "Generating session key" << endl;
         vector<byte> reply{0x01};
         vector<byte> key = generateSessionKey();
         vector<byte> encryptedKey = encryptSessionKey(key.data(), publicKey);
@@ -69,6 +82,13 @@ vector<byte> CSPA::generateSessionKey() {
     byte key[AES::DEFAULT_KEYLENGTH];
     rnd.GenerateBlock(key, sizeof(key));
 
+    string readable;
+    CryptoPP::HexEncoder encoder;
+    encoder.Attach( new CryptoPP::StringSink( readable ) );
+    encoder.Put( key, sizeof(key));
+    encoder.MessageEnd();
+    cout << "Generated session key: " << readable << endl;
+
     return vector<byte>(key, key + sizeof(key));
 }
 
@@ -77,7 +97,13 @@ vector<byte> CSPA::encryptSessionKey(const byte *key, const RSA::PublicKey &publ
     AutoSeededRandomPool rnd;
     string cipher;
     StringSource((char *) key, true, new PK_EncryptorFilter(rnd, encryptor, new StringSink(cipher)));
-    cout << "Encrypted session key: " << cipher << endl;
+
+    string readable;
+    CryptoPP::HexEncoder encoder;
+    encoder.Attach( new CryptoPP::StringSink( readable ) );
+    encoder.Put( (byte*)cipher.c_str(), cipher.length());
+    encoder.MessageEnd();
+    cout << "Encrypted session key: " << readable << endl;
 
     return vector<byte>(&cipher[0], &cipher[0] + cipher.length());
 }

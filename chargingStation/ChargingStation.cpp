@@ -10,8 +10,6 @@ vector<byte> ChargingStation::authenticate(const char *preHead, const char *hash
         vector<byte> sessionKey(reply.begin() + 1, reply.begin() + AES::DEFAULT_KEYLENGTH + 1);
         this->keysMap[hashOBU] = string(sessionKey.begin(), sessionKey.end());
         vector<byte> encryptedKey(reply.begin() + AES::DEFAULT_KEYLENGTH + 1, reply.end());
-        cout << "Reply size: " << reply.size() << endl;
-        cout << "Size: " << encryptedKey.size() << endl;
         return encryptedKey;
     } else {
         return reply;

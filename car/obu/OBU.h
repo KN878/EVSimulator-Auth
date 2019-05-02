@@ -5,7 +5,9 @@
 #ifndef EVSIMULATOR_OBU_H
 #define EVSIMULATOR_OBU_H
 
+#include <iostream>
 #include <string>
+#include <cryptopp/hex.h>
 #include <cryptopp/rsa.h>
 #include <cryptopp/secblock.h>
 #include <cryptopp/osrng.h>

@@ -19,8 +19,6 @@ void OBU::generateKeyPair() {
     params.GenerateRandomWithKeySize(rng, 3072);
     RSA::PrivateKey privateKey(params);
     RSA::PublicKey publicKey(params);
-    privateKey.ThrowIfInvalid(rng, 3);
-    publicKey.ThrowIfInvalid(rng, 3);
 
     this->privateKey = privateKey;
     this->publicKey = publicKey;
@@ -39,10 +37,19 @@ RSA::PublicKey OBU::getPublicKey() {
 }
 
 void OBU::setSessionKey(const string encryptedKey) {
+    cout << "Decrypting session key" << endl;
     AutoSeededRandomPool rnd;
     string decrypted;
     RSAES_OAEP_SHA_Decryptor decryptor(this->privateKey);
     StringSource(encryptedKey, true, new PK_DecryptorFilter(rnd, decryptor, new StringSink(decrypted)));
+
+    string readable;
+    CryptoPP::HexEncoder encoder;
+    encoder.Attach( new CryptoPP::StringSink( readable ) );
+    encoder.Put( (byte*)decrypted.c_str(), decrypted.length());
+    encoder.MessageEnd();
+    cout << "Decrypted session key: " << readable << endl;
+
     this->sessionKey = SecByteBlock(reinterpret_cast<const byte *>(&decrypted[0]), decrypted.size());
 }
 

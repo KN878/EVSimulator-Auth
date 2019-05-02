@@ -17,8 +17,10 @@ private:
     DMV &dmv = DMV::getInstance();
     CSPA &cspa = CSPA::getInstance();
     vector<ChargingStation> chargingStations;
+
+    void addCar();
 public:
-    void addNewCar();
+    void addNewCarS(const int count);
 
     void addChargingStations(const int count);
 
